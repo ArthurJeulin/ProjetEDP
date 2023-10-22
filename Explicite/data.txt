@@ -2,7 +2,7 @@
  10             ! ny:       number of cells in y-direction
  3.e-3          ! Lx:       length of the domain (m)
  250.e-6        ! Ly:       height of the domain (m)
- 5.e-2          ! U0:       characteristic parameter for the velocity (s^-1)
+ 1.e-2          ! U0:       characteristic parameter for the velocity (s^-1)
  2.e-5          ! D:        thermal diffusivity (m^2/s)
  20.            ! Ti:       Initial temperature in the domain (Celsius)
  20.            ! Tg:       Temperature at the left (Celsius)
