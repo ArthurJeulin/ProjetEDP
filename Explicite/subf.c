@@ -125,7 +125,7 @@ void meshc(struct type_donneesc param,float **x,float **y,float **xv,float **yv,
 int i,j;
 
 printf("creating mesh...\n");
-printf("maillage : %d \n vitesse : %d\n",maillage,vitesse);
+//printf("maillage : %d \n vitesse : %d\n",maillage,vitesse);
 // Uniform mesh (streching-compressing flow + rotating flow)
 //for (i=0;i<param.nx+1;i++){
 //    for (j=0;j<param.ny+1;j++){
@@ -163,7 +163,7 @@ switch (maillage) {
             x[i][j]=param.Lx*(float)(i)/(float)(param.nx);
             y[i][j]=param.Ly*(float)(j)/(float)(param.ny);
             //on calcule y irregulier
-            y[i][j]=(param.Ly/2)*(1-cos(M_PI*y[i][j]/(param.Ly)));
+            y[i][j]=(param.Ly)*(1-cos(M_PI*y[i][j]/(2*param.Ly)));
             }
         }
         break;
@@ -175,9 +175,10 @@ switch (maillage) {
             y[i][j]=param.Ly*(float)(j)/(float)(param.ny);
             //on calcule x, y irregulier
             x[i][j]= (x[i][j]*x[i][j])/param.Lx;
-            y[i][j]=(param.Ly/2)*(1-cos(M_PI*y[i][j]/(param.Ly)));
+            y[i][j]=(param.Ly)*(1-cos(M_PI*y[i][j]/(2*param.Ly)));
             }
         }
+        break;
     default:
         printf("Erreur avec maillage.\n");
         exit(1);
@@ -204,7 +205,7 @@ void initial_conditionc(struct type_donneesc param,float **xv,float **yv,float *
     int i,j;
 
     printf("initial condition...\n");
-    printf("maillage : %d \n vitesse : %d\n",maillage,vitesse);
+    //printf("maillage : %d \n vitesse : %d\n",maillage,vitesse);
 
     for (i=0;i<param.nx;i++){
         for (j=0;j<param.ny;j++){
@@ -212,11 +213,28 @@ void initial_conditionc(struct type_donneesc param,float **xv,float **yv,float *
         }
     }
 
-    for (i=0;i<param.nx+1;i++){
-        for (j=0;j<param.ny;j++){
-            U[i][j] = param.U0 ;
-        }
+    switch (vitesse) {
+        case 0:
+            for (i=0;i<param.nx+1;i++){
+                for (j=0;j<param.ny;j++){
+                    U[i][j] = param.U0 ;
+                }
+            }
+            break;
+        case 1:
+            for (i=0;i<param.nx+1;i++){
+                for (j=0;j<param.ny;j++){
+                    //Champ de vitesse selon x
+                    U[i][j] =(6*param.U0)*(y[i][j]/(2*param.Ly))*(1-(y[i][j]/(2*param.Ly)));
+                }
+            }
+            break;
+        default:
+            printf("Erreur avec vitesse.\n");
+            exit(1);
+            break;
     }
+
     for (i=0;i<param.nx;i++){
         for (j=0;j<param.ny+1;j++){
             V[i][j] = 0.;

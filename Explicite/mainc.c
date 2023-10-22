@@ -51,7 +51,7 @@ else {
     printf("La valeur entrée n'est pas bonne.\n");
     exit(1);
 }
-printf("Definir vitesse => Entrer 0 = Uniforme ; 1 = Non Uniforme : ");
+printf("Definir vitesse ===> \n 0 = Uniforme \n 1 = Non Uniforme \n Entrer une valeur : ");
 scanf("%d", &defaultState.vitesse);
 
 if (defaultState.vitesse== 0 || defaultState.vitesse == 1) {
