@@ -1,6 +1,6 @@
 #ifndef DATA_H_INCLUDED
 #define DATA_H_INCLUDED
-
+#include <stdbool.h> 
 typedef struct type_donneesc
 {   int nx;       // nb of cells in x-direction
     int ny;       // nb of cells in y-direction
