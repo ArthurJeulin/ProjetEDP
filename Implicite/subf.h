@@ -1,6 +1,6 @@
 struct type_donneesc read_datac();
-void meshc(struct type_donneesc param,float **x,float **y,float **xv,float **yv,float **vol);
-void initial_conditionc(struct type_donneesc param,float **xv,float **yv, float **x,float **y,float **T0,float **U,float **V);
+void meshc(struct type_donneesc param,float **x,float **y,float **xv,float **yv,float **vol,int maillage, int vitesse);
+void initial_conditionc(struct type_donneesc param,float **xv,float **yv, float **x,float **y,float **T0,float **U,float **V,int maillage, int vitesse);
 float calc_dtc(int nx, int ny,  float **x, float **y,float **U,float CFL,float **V, float D, float R);
 void calc_flux_advc(struct type_donneesc param,float **x,float **y,float **xv,float **yv,float **U, float **V, float **T0,float **Fadv);
 void calc_flux_diffc(struct type_donneesc param,float **x,float **y,float **xv,float **yv,float **T0,float **Fdiff);

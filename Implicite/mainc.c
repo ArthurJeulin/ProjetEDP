@@ -2,16 +2,20 @@
 #include<math.h>
 #include<complex.h>
 #include<stdio.h>
+#include <stdbool.h> 
 #include<stdlib.h>
 #include<string.h>
 #include"subf.h"
 #include"VTSW.h"
 #include"data.h"
 
+struct state{
+  int maillage; // 0 = Uniforme ; 1 = Non Uniforme
+  int vitesse ; // 0 = Uniforme ; 1 = Non Uniforme
+}defaultState;
 
 int main()
 {
-
 struct type_donneesc param;
 float **x,**y,**xv,**yv,**vol;
 float **T0,**T1;
@@ -29,10 +33,38 @@ float *X;    //vecteur qui contiendra la solution de SOR
 int LB;      //Largeur de la bande;
 
 printf("simulation started\n");
-
 param=read_datac();
 int tailleMat=(param.nx*param.ny);
-//cout<<"dans le C : "<<param.nx<<" "<<param.ny<<" "<<param.Lx<<" "<<param.Ly<<" "<<param.U0<<" "<<param.D<<" "<<param.Ti<<" "<<param.Tg<<" "<<param.Tb<<" "<<param.tf<<" "<<param.Nout<<" "<<param.CFL<<" "<<param.R<<endl;
+printf("-------------------------------------------------------------------\n");
+printf(" param.nx : %d  param.ny : %d\n param.Lx : %f m param.Ly : %f m\n param.U0 : %f s^-1 \n param.D : %f m^2/s\n param.Ti : %f ( Initial temperature)\n param.Tg : %f Temperature at the left (Celsius)\n param.Tb : %f Temperature at the bottom (Celsius) \n param.tf : %f final time (s)\n param.Nout : %d number of intermediate unsaved time steps \n param.CFL : %f Courant's number (advection) \n param.R : %f ourier's number (diffusion)\n",
+param.nx,param.ny,param.Lx,param.Ly,param.U0,param.D,param.Ti,param.Tg,param.Tb,param.tf,param.Nout,param.CFL,param.R);
+printf("-------------------------------------------------------------------\n");
+printf("Choix du maillage et de la vitesse : \n");
+printf("Definir maillage ===>\n 0 = Uniforme (x,y)\n 1 = Non Uniforme suivant x\n 2 = Non Uniforme suivant y\n 3 = Non Uniforme suivant (x,y)\n Entrer une valeur : ");
+scanf("%d", &defaultState.maillage);
+
+if (defaultState.maillage == 0 || defaultState.maillage == 1|| defaultState.maillage == 2|| defaultState.maillage == 3) {
+       // printf("Vous avez entré : %d\n", defaultState.maillage);
+} 
+else {
+    printf("Vous avez entré : %d\n", defaultState.maillage);
+    printf("La valeur entrée n'est pas bonne.\n");
+    exit(1);
+}
+printf("Definir vitesse ===> \n 0 = Uniforme \n 1 = Non Uniforme \n Entrer une valeur : ");
+scanf("%d", &defaultState.vitesse);
+
+if (defaultState.vitesse== 0 || defaultState.vitesse == 1) {
+        //printf("Vous avez entré : %d\n", defaultState.vitesse);
+} 
+else {
+    printf("Vous avez entré : %d\n", defaultState.vitesse);
+     printf("La valeur entrée n'est ni 1 ni 0.\n");
+     exit(1);
+}
+printf("-------------------------------------------------------------------\n");
+//printf("maillage : %d \n vitesse : %d\n",defaultState.maillage,defaultState.vitesse);
+
 // Allocation dynamique
     x=(float**)malloc((param.nx+1)*sizeof(float*));
     for (int i=0;i<param.nx+1;i++) {x[i]=(float*)malloc((param.ny+1)*sizeof(float));}
@@ -57,10 +89,10 @@ int tailleMat=(param.nx*param.ny);
     Fdiff=(float**)malloc((param.nx)*sizeof(float*));
     for (int i=0;i<param.nx;i++) {Fdiff[i]=(float*)malloc((param.ny)*sizeof(float));}
 
-meshc(param,x,y,xv,yv,vol);
+meshc(param,x,y,xv,yv,vol,defaultState.maillage,defaultState.vitesse);
 
-initial_conditionc(param,xv,yv,x,y,T0,U,V);
 
+initial_conditionc(param,xv,yv,x,y,T0,U,V,defaultState.maillage,defaultState.vitesse);
 VTSWriterc(0.0,0,param.nx+1,param.ny+1,x,y,T0,U,V,"ini");
 
 dt= calc_dtc(param.nx,param.ny,x,y,U,param.CFL,V,param.D,param.R);
@@ -102,21 +134,8 @@ if((param.i_solver)==1)
   B=(float*)malloc((tailleMat)*sizeof(float*));
 
   printf("not implemented\n");
-  
-   for(int i=0;i<param.nx;++i)
-  {
-    for ( int j = 0; j<param.ny;++j)
-    { int k=i+param.nx*j
+   // (to be completed)
 
-    float a=(dt/vol[i][j])*D*()
-      A[k][k]=1+a;
-      A[k][k+1]=d;
-      A[k][k-1]=e;
-      A[k][k+param.nx]=b;
-      A[k][k-param.nx]=c;
-    }
-    
-  }
   free(A);
   free(B);
   }
