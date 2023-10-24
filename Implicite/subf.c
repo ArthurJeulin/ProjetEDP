@@ -599,8 +599,90 @@ void creation_A(struct type_donneesc param,int NA, float dt, float **x,float **y
         A[k][k-param.nx] = c;
 
     }
+    //Coin 0
+    /*
+    Problème en Ti-1,j et Ti,j-1
+    Condition Limite T(x= 0,y = 0) = Te
+    */
+    i = 0 ;
+    j = 0 ;
+    k = j*param.nx + i;
+    //Calcul des coefficient (a,b,c,d,e,f)
+    a = ((dt/vol[i][j])*(param.D)*( (deltaX(i,j,x)/deltaY(i,j,yv)) + (deltaX(i,j,x)/(deltaY(i,j,yv)/2))+ (deltaY(i,j,y)/deltaX(i,j,xv)) + (deltaY(i,j,y)/(deltaX(i,j,xv)/2))  ));
+    b = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j,yv)) ));
+    //c = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j-1,yv)) ));
+    d = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,y)/deltaX(i,j,xv)) ));
+    //e = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,x)/deltaX(i-1,j,xv)) ));
+    A[k][k] = 1 + a ;
+    A[k][k+1] = d ;
+    //A[k][k-1] = e;
+    A[k][k+param.nx] = b;
+    //A[k][k-param.nx] = c;
     
-
+    //Coin C
+    /*
+    Problème en Ti-1,j et Ti,j+1
+    Condition Limite T(x= 0,y = Ny-1) = Te
+    Condition Limite dT/dy = 0; Ce qui annule le flux diff Nord
+    */
+    i = 0 ;
+    j = param.ny - 1;
+    k = j*param.nx + i;
+    //Calcul des coefficient (a,b,c,d,e,f)
+    a = ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/(deltaY(i,j-1,yv)))+ (deltaY(i,j,y)/deltaX(i,j,xv)) + (deltaY(i,j,y)/((deltaX(i,j,xv)/2))) ));
+    //b = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j,yv)) ));
+    c = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j-1,yv)) ));
+    d = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,y)/deltaX(i,j,xv)) ));
+    //e = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,x)/deltaX(i-1,j,xv)) ));
+    A[k][k] = 1 + a ;
+    A[k][k+1] = d ;
+    //A[k][k-1] = e;
+    //A[k][k+param.nx] = b;
+    A[k][k-param.nx] = c;
+    
+    //Coin A
+    /*
+    Problème en Ti-1,j et Ti,j+1
+    Condition Limite (dT/dx)(n) = (dT/dx)(n-1)
+    On a flux diff Est = - flux diff Ouest  
+    Condition Limite dT/dy = 0; Ce qui annule le flux diff Nord
+    */
+    i = param.nx - 1 ;
+    j = 0;
+    k = j*param.nx + i;
+    //Calcul des coefficient (a,b,c,d,e,f)
+    a =   ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j,yv)) + (deltaX(i,j,x)/(deltaY(i,j,yv)/2) )));
+    b = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j,yv)) ));
+    // c = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j-1,yv)) ));
+    // d = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,y)/deltaX(i,j,xv)) ));
+    // e = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,x)/deltaX(i-1,j,xv)) ));
+    A[k][k] = 1 + a ;
+    // A[k][k+1] = d ;
+    // A[k][k-1] = e;
+    A[k][k+param.nx] = b;
+    //A[k][k-param.nx] = c;
+        
+    //Coin B
+    /*
+    Problème en Ti+1,j et Ti,j+1
+    Condition Limite (dT/dx)(n) = (dT/dx)(n-1)
+    On a flux diff Est = - flux diff Ouest  
+    Condition Limite dT/dy = 0; Ce qui annule le flux diff Nord
+    */
+    i = param.nx - 1 ;
+    j = param.ny - 1;
+    k = j*param.nx + i;
+    //Calcul des coefficient (a,b,c,d,e,f)
+    a =   ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j-1,yv)) ));
+    //b = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j,yv)) ));
+    c = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j-1,yv)) ));
+    // d = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,y)/deltaX(i,j,xv)) ));
+    // e = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,x)/deltaX(i-1,j,xv)) ));
+    A[k][k] = 1 + a ;
+    // A[k][k+1] = d ;
+    // A[k][k-1] = e;
+    //A[k][k+param.nx] = b;
+    A[k][k-param.nx] = c;
 }
 
 
@@ -664,7 +746,56 @@ void creation_B(struct type_donneesc param, int NA, float dt, float **x, float *
         k = j*param.nx + i;
         B[i*param.ny + j] = T0[i][j] +(dt/vol[i][j])*Fadv[i][j] ;
     }
+    //Coin 0
+    /*
+    Problème en Ti-1,j et Ti,j-1
+    Condition Limite T(x= 0,y = 0) = Te
+    */
+    i = 0 ;
+    j = 0 ;
+    k = j*param.nx + i;
+    //Calcul des coefficient (a,b,c,d,e,f)
+    c = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/(deltaY(i,j,yv)/2)) ));
+    e = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,x)/(deltaX(i,j,xv)/2)) ));
+    B[i*param.ny + j] = -c*param.Tb -e*param.Tg + T0[i][j] +(dt/vol[i][j])*Fadv[i][j];
 
+    //Coin C
+    /*
+    Problème en Ti-1,j et Ti,j+1
+    Condition Limite T(x= 0,y = Ny-1) = Te
+    Condition Limite dT/dy = 0; Ce qui annule le flux diff Nord
+    */
+    i = 0 ;
+    j = param.ny - 1;
+    k = j*param.nx + i;
+    e = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,x)/(deltaX(i,j,xv)/2)) ));
+    B[i*param.ny + j] = -e*param.Tg + T0[i][j] +(dt/vol[i][j])*Fadv[i][j];
+    
+    //Coin A
+    /*
+    Problème en Ti-1,j et Ti,j+1
+    Condition Limite (dT/dx)(n) = (dT/dx)(n-1)
+    On a flux diff Est = - flux diff Ouest  
+    Condition Limite dT/dy = 0; Ce qui annule le flux diff Nord
+    */
+    i = param.nx - 1 ;
+    j = 0;
+    k = j*param.nx + i;
+    //Calcul des coefficient (a,b,c,d,e,f)
+    c = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/(deltaY(i,j-1,yv)/2) )));
+    B[i*param.ny + j] = -c*param.Tb + T0[i][j] +(dt/vol[i][j])*Fadv[i][j];
+    
+    //Coin B
+    /*
+    Problème en Ti+1,j et Ti,j+1
+    Condition Limite (dT/dx)(n) = (dT/dx)(n-1)
+    On a flux diff Est = - flux diff Ouest  
+    Condition Limite dT/dy = 0; Ce qui annule le flux diff Nord
+    */
+    i = param.nx - 1 ;
+    j = param.ny - 1;
+    k = j*param.nx + i;
+    B[i*param.ny + j] =  T0[i][j] +(dt/vol[i][j])*Fadv[i][j];    
 }
 
 
