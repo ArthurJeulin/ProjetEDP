@@ -135,10 +135,6 @@ printf("creating mesh...\n");
 //}
 
 // Uniform mesh (parabolic flow)
-/*
-x[i][j] correspond au boards de la case
-xv[i][j] correspond au maillage horizontal des centres des cases
-*/
 switch (maillage) {
     case 0:
         for (i=0;i<param.nx+1;i++){
@@ -213,7 +209,7 @@ void initial_conditionc(struct type_donneesc param,float **xv,float **yv,float *
 
     for (i=0;i<param.nx;i++){
         for (j=0;j<param.ny;j++){
-            T0[i][j]=param.Ti; // Condition Initial pour la conduite à t = 0 pour(x,y)
+            T0[i][j]=param.Ti;
         }
     }
 
@@ -480,44 +476,12 @@ for (i=0;i<param.nx;i++)
     }
 }
 }
-// difference horizontal au niveau des bords
-// difference horizontal au centre de la cellule de calcul
-float deltaX(int i, int j,float **x ){
- return x[i+1][j] - x[i][j];
-//deltaX = xv[i+1][j] - xv[i][j];
-}
-// difference vertical au niveau des bords
-// difference vertical au centre de la cellule de calcul
-float deltaY(int i, int j,float **y){
-    return y[i][j+1] - y[i][j];
-//deltaY = yv[i][j+1] - yv[i][j];
-}
+
 //*********************************************
 void creation_A(struct type_donneesc param,int NA, float dt, float **x,float **y,float **xv,float **yv,float **vol,float **A)
 {
 
-    int k;
-    float a,b,c,d,e;
-
-	for (int i=0;i<param.nx;i++){
-        for (int j=0;j<param.ny;j++){
-            k = j*param.nx + i;
-            //Calcul des coefficient (a,b,c,d,e,f)
-            a = ((dt/vol[i][j])*(param.D)*( (deltaY(i,j,y)/deltaX(i,j,xv)) + (deltaY(i,j,y)/deltaX(i-1,j,xv)) + (deltaX(i,j,x)/deltaY(i,j,yv)) + (deltaX(i,j,x)/deltaY(i,j-1,yv)) ));
-            b = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j,yv)) ));
-            c = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j-1,yv)) ));
-            d = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,y)/deltaX(i,j,xv)) ));
-            e = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,x)/deltaX(i-1,j,xv)) ));
-            A[k][k] = 1 + a ;
-            A[k][k+1] = d ;
-            A[k][k-1] = e;
-            A[k][k+param.nx] = b;
-            A[k][k-param.nx] = c;
-
-        }
-    }
-
-
+// to be completed
 
 }
 
@@ -528,12 +492,7 @@ void creation_A(struct type_donneesc param,int NA, float dt, float **x,float **y
 void creation_B(struct type_donneesc param, int NA, float dt, float **x, float **y,float **xv,float **yv,float **vol, float **Fadv, float **T0, float *B)
 {
 
-	for (int i=0;i<param.nx;i++){
-        for (int j=0;j<param.ny;j++){
-            //Rappel B juste Vecteur colonne de taille Ny
-            B[i*param.ny + j] = T0[i][j] +(dt/vol[i][j])*Fadv[i][j] ;
-        }
-    }
+	// to be completed
 
 
 }
@@ -543,13 +502,8 @@ void creation_B(struct type_donneesc param, int NA, float dt, float **x, float *
 
 void miseajour_T(struct type_donneesc param,float **T0,float **T1,float *B)
 {
-//int  i,j;
-for (int i=0;i<param.nx;i++){
-    for (int j=0;j<param.ny;j++){
-        
-        T1[i][j] = T0[i][j];
-    }
-}
+
+// to be completed
 
 }
 

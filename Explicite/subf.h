@@ -11,5 +11,4 @@ void gaussij(int LV, float **A, float *B);
 void miseajour_T(struct type_donneesc param,float **T0,float **T1,float *B);
 void create_A_band(int MX,int NA,float **A, float **AB);
 void SOR(int MX,int N,float **A,float *B,float R0,float W, float *X);
-float deltaX(int i, int j,float **x );
-float deltaY(int i, int j,float **y);
+

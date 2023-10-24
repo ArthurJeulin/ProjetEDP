@@ -133,22 +133,7 @@ if((param.i_solver)==1)
 
   B=(float*)malloc((tailleMat)*sizeof(float*));
 
-  printf("Gauss implemented\n");
-
-  for (l=1;l<N;l++)
-    {
-    printf("Iteration l=%d...\n",l);
-    calc_flux_advc(param,x,y,xv,yv,U,V,T0,Fadv);
-    calc_flux_diffc(param,x,y,xv,yv,T0,Fdiff);
-    creation_B(param, NA,dt, x, y,xv,yv,vol, Fadv,T0, B);
-    
-    GAUSSIJ(param.nx*param.ny, A, B);
-
-    if((l%param.Nout)==0)
-      {
-      VTSWriterc((float)(l)*dt,l,param.nx+1,param.ny+1,x,y,T1,U,V,"int");
-      }
-    }
+  printf("not implemented\n");
    // (to be completed)
 
   free(A);
