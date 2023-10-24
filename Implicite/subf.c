@@ -804,10 +804,12 @@ void creation_B(struct type_donneesc param, int NA, float dt, float **x, float *
 void miseajour_T(struct type_donneesc param,float **T0,float **T1,float *B)
 {
 //int  i,j;
+int k;
 for (int i=0;i<param.nx;i++){
     for (int j=0;j<param.ny;j++){
-        
-        T1[i][j] = T0[i][j];
+        k = j*param.nx + i;
+        T0[i][j] = B[i*param.ny + j] ;
+        T1[i][j] = B[i*param.ny + j];
     }
 }
 

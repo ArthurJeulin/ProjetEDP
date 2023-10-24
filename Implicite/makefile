@@ -1,6 +1,6 @@
 
-prog.exe : mainc.o subf.o VTSW.o 
-	gcc -g -o prog.exe mainc.o subf.o VTSW.o -lm 
+prog.exe : mainc.o subf.o VTSW.o gaussij.o
+	gcc -g -o prog.exe mainc.o subf.o VTSW.o gaussij.o -lm 
 
 mainc.o : mainc.c
 	gcc -g -c mainc.c 	
@@ -10,4 +10,6 @@ VTSW.o : VTSW.c
 subf.o : subf.c
 	gcc -g -c subf.c
 
+gaussij.o: gaussij.c
+	gcc -g -c gaussij.c
 
