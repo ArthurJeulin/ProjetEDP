@@ -496,14 +496,14 @@ float deltaY(int i, int j,float **y){
 void creation_A(struct type_donneesc param,int NA, float dt, float **x,float **y,float **xv,float **yv,float **vol,float **A)
 {
 
-    int k;
+    int k, i, j ;
     float a,b,c,d,e;
-
-	for (int i=0;i<param.nx;i++){
-        for (int j=0;j<param.ny;j++){
+    //Cas dans le domaine
+	for (int i=1;i<param.nx-2;++i){
+        for (int j=1;j<param.ny-2;++j){
             k = j*param.nx + i;
             //Calcul des coefficient (a,b,c,d,e,f)
-            a = ((dt/vol[i][j])*(param.D)*( (deltaY(i,j,y)/deltaX(i,j,xv)) + (deltaY(i,j,y)/deltaX(i-1,j,xv)) + (deltaX(i,j,x)/deltaY(i,j,yv)) + (deltaX(i,j,x)/deltaY(i,j-1,yv)) ));
+            a = ((dt/vol[i][j])*(param.D)*( (deltaX(i,j,x)/deltaY(i,j,yv)) + (deltaX(i,j,x)/deltaY(i,j-1,yv))+ (deltaY(i,j,y)/deltaX(i,j,xv)) + (deltaY(i,j,y)/deltaX(i-1,j,xv))  ));
             b = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j,yv)) ));
             c = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j-1,yv)) ));
             d = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,y)/deltaX(i,j,xv)) ));
@@ -516,8 +516,90 @@ void creation_A(struct type_donneesc param,int NA, float dt, float **x,float **y
 
         }
     }
+    //Segment [OC]
+    /*
+    attention a delta(i-1)
+    Ti-1 = Te
+    e passee dans B
+    */
+    i = 0; 
+	for (int j=1;j<param.ny-2;++j){
+        k = j*param.nx + i;
+        //Calcul des coefficient (a,b,c,d,e,f)
+        a = ((dt/vol[i][j])*(param.D)*( (deltaX(i,j,x)/deltaY(i,j,yv)) + (deltaX(i,j,x)/deltaY(i,j-1,yv)) + (deltaY(i,j,y)/deltaX(i,j,xv)) + (deltaY(i,j,y)/(deltaX(i,j,xv))/2)  ));
+        b = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j,yv)) ));
+        c = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j-1,yv)) ));
+        d = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,y)/deltaX(i,j,xv)) ));
+        //e = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,y)/(deltaX(i,j,xv))/2) ));
+        A[k][k] = 1 + a ;
+        A[k][k+1] = d ;
+        //A[k][k-1] = e;
+        A[k][k+param.nx] = b;
+        A[k][k-param.nx] = c;
+    }
 
+    //Segment [OA]
+    /*
+    attention a deltaY(j-1)
+    Tj-1 = Tp
+    c passee dans B
+    */
+    j = 0; 
+	for (int i=1;i<param.nx-2;++i){
+        k = j*param.nx + i;
+        //Calcul des coefficient (a,b,c,d,e,f)
+        a = ((dt/vol[i][j])*(param.D)*( (deltaX(i,j,x)/deltaY(i,j,yv)) + (deltaX(i,j,x)/(deltaY(i,j,yv)/2)) + (deltaY(i,j,y)/deltaX(i,j,xv)) + (deltaY(i,j,y)/deltaX(i,j-1,xv))  ));
+        b = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j,yv)) ));
+      //  c = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j-1,yv)) ));
+        d = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,y)/deltaX(i,j,xv)) ));
+        e = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,y)/(deltaX(i,j,xv))/2) ));
+        A[k][k] = 1 + a ;
+        A[k][k+1] = d ;
+        A[k][k-1] = e;
+        A[k][k+param.nx] = b;
+        //A[k][k-param.nx] = c;
+    }
+    //Segment [CB]
+    /*
+    Condition Limite dT/dy = 0; Ce qui annule le flux diff Nord
+    */
+    j = param.ny - 1; 
+	for (int i=1;i<param.nx-2;++i){
+        k = j*param.nx + i;
+        //Calcul des coefficient (a,b,c,d,e,f)
+        a = ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j-1,yv))+ (deltaY(i,j,y)/deltaX(i,j,xv)) + (deltaY(i,j,y)/deltaX(i-1,j,xv)) ));
+        //b = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j,yv)) ));
+        c = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j-1,yv)) ));
+        d = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,y)/deltaX(i,j,xv)) ));
+        e = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,y)/(deltaX(i,j,xv))/2) ));
+        A[k][k] = 1 + a ;
+        A[k][k+1] = d ;
+        A[k][k-1] = e;
+        //A[k][k+param.nx] = b;
+        A[k][k-param.nx] = c;
+    }
+    //Segment [AB]
+    /*
+    Condition Limite (dT/dx)(n) = (dT/dx)(n-1)
+    On a flux diff Est = - flux diff Ouest  
+    */
+    i = param.nx-1;
+    for (int j=1;j<param.ny-2;++j){
+        k = j*param.nx + i;
+        //Calcul des coefficient (a,b,c,d,e,f)
+        a = ((dt/vol[i][j])*(param.D)*( (deltaX(i,j,x)/deltaY(i,j,yv)) + (deltaX(i,j,x)/deltaY(i,j-1,yv)) ));
+        b = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j,yv)) ));
+        c = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j-1,yv)) ));
+        //d = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,y)/deltaX(i,j,xv)) ));
+        //e = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,x)/deltaX(i-1,j,xv)) ));
+        A[k][k] = 1 + a ;
+        //A[k][k+1] = d ;
+        //A[k][k-1] = e;
+        A[k][k+param.nx] = b;
+        A[k][k-param.nx] = c;
 
+    }
+    
 
 }
 
@@ -526,15 +608,62 @@ void creation_A(struct type_donneesc param,int NA, float dt, float **x,float **y
 
 
 void creation_B(struct type_donneesc param, int NA, float dt, float **x, float **y,float **xv,float **yv,float **vol, float **Fadv, float **T0, float *B)
-{
-
-	for (int i=0;i<param.nx;i++){
-        for (int j=0;j<param.ny;j++){
+    {
+    int k;
+    float a,b,c,d,e;        
+    //Cas dans le domaine
+	for (int i=1;i<param.nx-2;++i){
+        for (int j=1;j<param.ny-2;++j){
             //Rappel B juste Vecteur colonne de taille Ny
             B[i*param.ny + j] = T0[i][j] +(dt/vol[i][j])*Fadv[i][j] ;
         }
     }
 
+
+    //Segment [OC]
+    /*
+    attention a delta(i-1)
+    Ti-1 = Te
+    e passe dans B
+    */
+    int i = 0; 
+	for (int j=1;j<param.ny-2;++j){
+        k = j*param.nx + i;
+        e = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,y)/(deltaX(i,j,xv))/2) ));
+        B[i*param.ny + j] = -e*param.Tg + T0[i][j] +(dt/vol[i][j])*Fadv[i][j];
+    }
+    //Segment [OA]
+    /*
+    attention a deltaY(j-1)
+    Tj-1 = Tp
+    c passee dans B
+    */
+    int j = 0; 
+	for (int j=1;j<param.ny-2;++j){
+        k = j*param.nx + i;
+        c = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/(deltaY(i,j,yv)/2)) ));
+        B[i*param.ny + j] = -c*param.Tb + T0[i][j] +(dt/vol[i][j])*Fadv[i][j];
+    }
+    //Segment [CB]
+    /*
+    Condition Limite dT/dy = 0; Ce qui annule le flux diff Nord
+    */
+    j = param.ny - 1;
+	for (int i=1;i<param.nx-2;++i){
+        k = j*param.nx + i;
+        B[i*param.ny + j] = T0[i][j] +(dt/vol[i][j])*Fadv[i][j] ;
+        
+    }
+    //Segment [AB]
+    /*
+    Condition Limite (dT/dx)(n) = (dT/dx)(n-1)
+    On a flux diff Est = - flux diff Ouest 
+    */
+    i = param.nx-1;
+    for (int j=1;j<param.ny-2;++j){
+        k = j*param.nx + i;
+        B[i*param.ny + j] = T0[i][j] +(dt/vol[i][j])*Fadv[i][j] ;
+    }
 
 }
 
