@@ -173,21 +173,22 @@ if((param.i_solver)==1)
     
     //A la sortie de GAUSS, la solution se trouve dans B.
     gaussij(param.nx*param.ny, A, B);
-    printf("après gaussij--------------------------------------------------------\n");
-      if(l<1){
-        for (int i=0;i<param.nx;++i){
-          for (int j=0;j<param.ny;++j){
-              printf(" B[%d] = %f",i*param.ny + j,B[i*param.ny + j]);
-          }
-        printf("\n");
-        }
-      }
+    // printf("après gaussij--------------------------------------------------------\n");
+    //   if(l<1){
+    //     for (int i=0;i<param.nx;++i){
+    //       for (int j=0;j<param.ny;++j){
+    //           printf(" B[%d] = %f",i*param.ny + j,B[i*param.ny + j]);
+    //       }
+    //     printf("\n");
+    //     }
+    //   }
+
+    miseajour_T(param,T0,T1,B);
 
     if((l%param.Nout)==0)
       {
       VTSWriterc((float)(l)*dt,l,param.nx+1,param.ny+1,x,y,T1,U,V,"int");
       }
-    miseajour_T(param,T0,T1,B);
       // (to be completed)
     }
 

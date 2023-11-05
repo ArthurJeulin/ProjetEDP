@@ -174,12 +174,12 @@ switch (maillage) {
     case 3: 
         for (i=0;i<param.nx+1;i++){
             for (j=0;j<param.ny+1;j++){
-            //on calcule x,y regulier
-            x[i][j]=param.Lx*(float)(i)/(float)(param.nx);
-            y[i][j]=param.Ly*(float)(j)/(float)(param.ny);
-            //on calcule x, y irregulier
-            x[i][j]= (x[i][j]*x[i][j])/param.Lx;
-            y[i][j]=(param.Ly)*(1-cos(M_PI*y[i][j]/(2*param.Ly)));
+                //on calcule x,y regulier
+                x[i][j]=param.Lx*(float)(i)/(float)(param.nx);
+                y[i][j]=param.Ly*(float)(j)/(float)(param.ny);
+                //on calcule x, y irregulier
+                x[i][j]= (x[i][j]*x[i][j])/param.Lx;
+                y[i][j]=(param.Ly)*(1-cos(M_PI*y[i][j]/(2*param.Ly)));
             }
         }
         break;
@@ -209,7 +209,7 @@ void initial_conditionc(struct type_donneesc param,float **xv,float **yv,float *
     int i,j;
 
     printf("initial condition...\n");
-    //printf("maillage : %d \n vitesse : %d\n",maillage,vitesse);
+    printf("maillage : %d \n vitesse : %d\n",maillage,vitesse);
 
     for (i=0;i<param.nx;i++){
         for (j=0;j<param.ny;j++){
@@ -226,7 +226,7 @@ void initial_conditionc(struct type_donneesc param,float **xv,float **yv,float *
             }
             break;
         case 1:
-            for (i=0;i<param.nx+1;i++){
+            for (i=0;i<param.nx;i++){
                 for (j=0;j<param.ny;j++){
                     //Champ de vitesse selon x
                     U[i][j] =(6*param.U0)*(y[i][j]/(2*param.Ly))*(1-(y[i][j]/(2*param.Ly)));
@@ -554,7 +554,7 @@ void creation_A(struct type_donneesc param,int NA, float dt, float **x,float **y
         b = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j,yv)) ));
       //  c = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j-1,yv)) ));
         d = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,y)/deltaX(i,j,xv)) ));
-        e = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,y)/(deltaX(i,j,xv))/2) ));
+        e = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,y)/(deltaX(i,j,xv)/2)) ));
         A[k][k] = 1 +a ;
         A[k][k+1] = d ;
         A[k][k-1] = e;
@@ -575,7 +575,7 @@ void creation_A(struct type_donneesc param,int NA, float dt, float **x,float **y
         //b = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j,yv)) ));
         c = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j-1,yv)) ));
         d = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,y)/deltaX(i,j,xv)) ));
-        e = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,y)/(deltaX(i,j,xv))/2) ));
+        e = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,y)/(deltaX(i,j,xv)/2)) ));
         A[k][k] = 1 + a ;
         A[k][k+1] = d ;
         A[k][k-1] = e;
@@ -615,6 +615,7 @@ void creation_A(struct type_donneesc param,int NA, float dt, float **x,float **y
     k = j*param.nx + i;
    printf("k value le Coin 0: %d\n",k);
     //Calcul des coefficient (a,b,c,d,e,f)
+    // a = ((dt/vol[i][j])*(param.D)*( (deltaX(i,j,x)/deltaY(i,j,yv)) + (deltaX(i,j,x)/(deltaY(i,j,yv)/2))+ (deltaY(i,j,y)/deltaX(i,j,xv)) + (deltaY(i,j,y)/(deltaX(i,j,xv)/2))  ));
     a = ((dt/vol[i][j])*(param.D)*( (deltaX(i,j,x)/deltaY(i,j,yv)) + (deltaX(i,j,x)/(deltaY(i,j,yv)/2))+ (deltaY(i,j,y)/deltaX(i,j,xv)) + (deltaY(i,j,y)/(deltaX(i,j,xv)/2))  ));
     b = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j,yv)) ));
     //c = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j-1,yv)) ));
@@ -788,7 +789,7 @@ void creation_B(struct type_donneesc param, int NA, float dt, float **x, float *
     j = param.ny - 1;
     k = j*param.nx + i;
     //e = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,x)/(deltaX(i,j,xv)/2)) ));
-    e = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,y)/(deltaX(i,j,xv))/2) ));
+    e = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,y)/(deltaX(i,j,xv)/2)) ));
     B[k] = -e*param.Tg + T0[i][j] +(dt/vol[i][j])*Fadv[i][j];
     printf("k value le Coin C: => B[%d] : %f\n",k,B[k]);
    
@@ -831,10 +832,9 @@ int k = 0;
 for (int i=0;i<param.nx;i++){
     for (int j=0;j<param.ny;j++){
         k = j*param.nx + i;
-        T1[i][j] = B[i*param.ny + j] ;
-        T0[i][j] = B[i*param.ny + j] ;
-        float result = B[i*param.ny + j]; 
-       // printf("B(%d) = %f",k,result);
+        T1[i][j] = B[k] ;
+        T0[i][j] = B[k] ; 
+        printf("B[%d] = %f\n",k,B[k]);
     }
 }
 
