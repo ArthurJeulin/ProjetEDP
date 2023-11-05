@@ -137,12 +137,17 @@ if((param.i_solver)==1)
   B=(float*)malloc((tailleMat)*sizeof(float*));
 
   printf("Gauss implemented\n");
-
+  //Initialisation de toutes les valeurs à 0;
+  for (int i=0;i<param.nx*param.ny;++i){
+      for (int j=0;j<param.nx*param.ny;++j){
+        A[i][j] = 0;
+      }
+  }
   creation_A(param, NA, dt, x,y,xv,yv,vol,A);
 
   	for (int i=0;i<param.nx*param.ny;++i){
         for (int j=0;j<param.nx*param.ny;++j){
-            printf(" A[%d][%d] = %.3f",i,j,A[i][j]);
+            printf(" %.3f ",A[i][j]);
         }
         printf("\n");
     }

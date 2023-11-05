@@ -498,30 +498,22 @@ void creation_A(struct type_donneesc param,int NA, float dt, float **x,float **y
 
     int k, i, j ;
     float a,b,c,d,e;
-    printf("param.nx : %d param.ny : %d \n",param.nx,param.ny);
     //Cas dans le domaine
 	for (int i=1;i<param.nx-1;++i){
         for (int j=1;j<param.ny-1;++j){
             k = j*param.nx + i;
-            printf("k value le domaine: %d\n",k);
             //Calcul des coefficient (a,b,c,d,e,f)
-            // a = ((dt/vol[i][j])*(param.D)*( (deltaX(i,j,x)/deltaY(i,j,yv)) + (deltaX(i,j,x)/deltaY(i,j-1,yv))+ (deltaY(i,j,y)/deltaX(i,j,xv)) + (deltaY(i,j,y)/deltaX(i-1,j,xv))  ));
-            // b = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j,yv)) ));
-            // c = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j-1,yv)) ));
-            // d = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,y)/deltaX(i,j,xv)) ));
-            // e = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,x)/deltaX(i-1,j,xv)) ));
+            a = ((dt/vol[i][j])*(param.D)*( (deltaX(i,j,x)/deltaY(i,j,yv)) + (deltaX(i,j,x)/deltaY(i,j-1,yv))+ (deltaY(i,j,y)/deltaX(i,j,xv)) + (deltaY(i,j,y)/deltaX(i-1,j,xv))  ));
+            b = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j,yv)) ));
+            c = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j-1,yv)) ));
+            d = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,y)/deltaX(i,j,xv)) ));
+            e = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,x)/deltaX(i-1,j,xv)) ));
             A[k][k] = 1 + a ;
-            A[k][k+1] = 0 ;
+            A[k][k+1] = d ;
             A[k][k-1] = e;
             A[k][k+param.nx] = b;
             A[k][k-param.nx] = c;
-            // A[k][k] = 1 ;
-            // A[k][k+1] = 2 ;
-            // A[k][k-1] = 3;
-            // A[k][k+param.nx] = 4;
-            // A[k][k-param.nx] = 5;
-            
-
+            printf("k value le domaine: %d\n",k);
         }
     }
     //Segment [OC]
@@ -545,11 +537,7 @@ void creation_A(struct type_donneesc param,int NA, float dt, float **x,float **y
         //A[k][k-1] = e;
         A[k][k+param.nx] = b;
         A[k][k-param.nx] = c;
-        // A[k][k] = 1  ;
-        // A[k][k+1] = 2 ;
-        // //A[k][k-1] = e;
-        // A[k][k+param.nx] = 4;
-        // A[k][k-param.nx] = 5;
+        printf("A[k][k] : %f ; A[k][k+1] : %f ; A[k][k+param.nx] : %f ; A[k][k-param.nx] : %f \n",A[k][k],A[k][k+1],A[k][k+param.nx],A[k][k-param.nx]);
     }
 
     //Segment [OA]
@@ -567,25 +555,13 @@ void creation_A(struct type_donneesc param,int NA, float dt, float **x,float **y
       //  c = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j-1,yv)) ));
         d = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,y)/deltaX(i,j,xv)) ));
         e = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,y)/(deltaX(i,j,xv))/2) ));
-        // A[k][k] = 1 + a ;
-        // A[k][k+1] = d ;
-        // A[k][k-1] = e;
-        // A[k][k+param.nx] = b;
-        // //A[k][k-param.nx] = c;
         A[k][k] = 1 +a ;
         A[k][k+1] = d ;
         A[k][k-1] = e;
         A[k][k+param.nx] = b;
         //A[k][k-param.nx] = c;
-        
-        // A[k][k] = 1  ;
-        // A[k][k+1] = 2 ;
-        // A[k][k-1] = 3;
-        // A[k][k+param.nx] = 4;
-        // //A[k][k-param.nx] = c;
-
         printf("k value le Segment [OA]: %d\n",k);
-        
+        printf("A[k][k] : %f ; A[k][k+1] : %f ; A[k][k-1] : %f ; A[k][k+param.nx] : %f  \n",A[k][k],A[k][k+1], A[k][k-1],A[k][k+param.nx]);
     }
     //Segment [CB]
     /*
@@ -605,11 +581,6 @@ void creation_A(struct type_donneesc param,int NA, float dt, float **x,float **y
         A[k][k-1] = e;
         //A[k][k+param.nx] = b;
         A[k][k-param.nx] = c;
-        // A[k][k] = 1  ;
-        // A[k][k+1] = d ;
-        // A[k][k-1] = e;
-        // //A[k][k+param.nx] = b;
-        // A[k][k-param.nx] = c;
        printf("k value le Segment [CB]: %d\n",k);
     }
     //Segment [AB]
@@ -654,6 +625,8 @@ void creation_A(struct type_donneesc param,int NA, float dt, float **x,float **y
     //A[k][k-1] = e;
     A[k][k+param.nx] = b;
     //A[k][k-param.nx] = c;
+    printf("A[k][k] : %f ; A[k][k+1] : %f ; A[k][k+param.nx] : %f  \n",A[k][k],A[k][k+1],A[k][k+param.nx]);
+    
     
     //Coin C
     /*
