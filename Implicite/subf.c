@@ -498,21 +498,29 @@ void creation_A(struct type_donneesc param,int NA, float dt, float **x,float **y
 
     int k, i, j ;
     float a,b,c,d,e;
+    printf("param.nx : %d param.ny : %d \n",param.nx,param.ny);
     //Cas dans le domaine
-	for (int i=1;i<param.nx-2;++i){
-        for (int j=1;j<param.ny-2;++j){
+	for (int i=1;i<param.nx-1;++i){
+        for (int j=1;j<param.ny-1;++j){
             k = j*param.nx + i;
+            printf("k value le domaine: %d\n",k);
             //Calcul des coefficient (a,b,c,d,e,f)
-            a = ((dt/vol[i][j])*(param.D)*( (deltaX(i,j,x)/deltaY(i,j,yv)) + (deltaX(i,j,x)/deltaY(i,j-1,yv))+ (deltaY(i,j,y)/deltaX(i,j,xv)) + (deltaY(i,j,y)/deltaX(i-1,j,xv))  ));
-            b = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j,yv)) ));
-            c = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j-1,yv)) ));
-            d = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,y)/deltaX(i,j,xv)) ));
-            e = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,x)/deltaX(i-1,j,xv)) ));
+            // a = ((dt/vol[i][j])*(param.D)*( (deltaX(i,j,x)/deltaY(i,j,yv)) + (deltaX(i,j,x)/deltaY(i,j-1,yv))+ (deltaY(i,j,y)/deltaX(i,j,xv)) + (deltaY(i,j,y)/deltaX(i-1,j,xv))  ));
+            // b = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j,yv)) ));
+            // c = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j-1,yv)) ));
+            // d = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,y)/deltaX(i,j,xv)) ));
+            // e = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,x)/deltaX(i-1,j,xv)) ));
             A[k][k] = 1 + a ;
-            A[k][k+1] = d ;
+            A[k][k+1] = 0 ;
             A[k][k-1] = e;
             A[k][k+param.nx] = b;
             A[k][k-param.nx] = c;
+            // A[k][k] = 1 ;
+            // A[k][k+1] = 2 ;
+            // A[k][k-1] = 3;
+            // A[k][k+param.nx] = 4;
+            // A[k][k-param.nx] = 5;
+            
 
         }
     }
@@ -523,8 +531,9 @@ void creation_A(struct type_donneesc param,int NA, float dt, float **x,float **y
     e passee dans B
     */
     i = 0; 
-	for (int j=1;j<param.ny-2;++j){
+	for (int j=1;j<param.ny-1;++j){
         k = j*param.nx + i;
+        printf("k value le Segment [OC]: %d\n",k);
         //Calcul des coefficient (a,b,c,d,e,f)
         a = ((dt/vol[i][j])*(param.D)*( (deltaX(i,j,x)/deltaY(i,j,yv)) + (deltaX(i,j,x)/deltaY(i,j-1,yv)) + (deltaY(i,j,y)/deltaX(i,j,xv)) + (deltaY(i,j,y)/(deltaX(i,j,xv))/2)  ));
         b = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j,yv)) ));
@@ -536,6 +545,11 @@ void creation_A(struct type_donneesc param,int NA, float dt, float **x,float **y
         //A[k][k-1] = e;
         A[k][k+param.nx] = b;
         A[k][k-param.nx] = c;
+        // A[k][k] = 1  ;
+        // A[k][k+1] = 2 ;
+        // //A[k][k-1] = e;
+        // A[k][k+param.nx] = 4;
+        // A[k][k-param.nx] = 5;
     }
 
     //Segment [OA]
@@ -545,26 +559,40 @@ void creation_A(struct type_donneesc param,int NA, float dt, float **x,float **y
     c passee dans B
     */
     j = 0; 
-	for (int i=1;i<param.nx-2;++i){
+	for (int i=1;i<param.nx-1;++i){
         k = j*param.nx + i;
         //Calcul des coefficient (a,b,c,d,e,f)
-        a = ((dt/vol[i][j])*(param.D)*( (deltaX(i,j,x)/deltaY(i,j,yv)) + (deltaX(i,j,x)/(deltaY(i,j,yv)/2)) + (deltaY(i,j,y)/deltaX(i,j,xv)) + (deltaY(i,j,y)/deltaX(i,j-1,xv))  ));
+        a = ((dt/vol[i][j])*(param.D)*( (deltaX(i,j,x)/deltaY(i,j,yv)) + (deltaX(i,j,x)/(deltaY(i,j,yv)/2)) + (deltaY(i,j,y)/deltaX(i,j,xv)) + (deltaY(i,j,y)/deltaX(i-1,j,xv))  ));
         b = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j,yv)) ));
       //  c = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j-1,yv)) ));
         d = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,y)/deltaX(i,j,xv)) ));
         e = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,y)/(deltaX(i,j,xv))/2) ));
-        A[k][k] = 1 + a ;
+        // A[k][k] = 1 + a ;
+        // A[k][k+1] = d ;
+        // A[k][k-1] = e;
+        // A[k][k+param.nx] = b;
+        // //A[k][k-param.nx] = c;
+        A[k][k] = 1 +a ;
         A[k][k+1] = d ;
         A[k][k-1] = e;
         A[k][k+param.nx] = b;
         //A[k][k-param.nx] = c;
+        
+        // A[k][k] = 1  ;
+        // A[k][k+1] = 2 ;
+        // A[k][k-1] = 3;
+        // A[k][k+param.nx] = 4;
+        // //A[k][k-param.nx] = c;
+
+        printf("k value le Segment [OA]: %d\n",k);
+        
     }
     //Segment [CB]
     /*
     Condition Limite dT/dy = 0; Ce qui annule le flux diff Nord
     */
     j = param.ny - 1; 
-	for (int i=1;i<param.nx-2;++i){
+	for (int i=1;i<param.nx-1;++i){
         k = j*param.nx + i;
         //Calcul des coefficient (a,b,c,d,e,f)
         a = ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j-1,yv))+ (deltaY(i,j,y)/deltaX(i,j,xv)) + (deltaY(i,j,y)/deltaX(i-1,j,xv)) ));
@@ -577,6 +605,12 @@ void creation_A(struct type_donneesc param,int NA, float dt, float **x,float **y
         A[k][k-1] = e;
         //A[k][k+param.nx] = b;
         A[k][k-param.nx] = c;
+        // A[k][k] = 1  ;
+        // A[k][k+1] = d ;
+        // A[k][k-1] = e;
+        // //A[k][k+param.nx] = b;
+        // A[k][k-param.nx] = c;
+       printf("k value le Segment [CB]: %d\n",k);
     }
     //Segment [AB]
     /*
@@ -584,8 +618,9 @@ void creation_A(struct type_donneesc param,int NA, float dt, float **x,float **y
     On a flux diff Est = - flux diff Ouest  
     */
     i = param.nx-1;
-    for (int j=1;j<param.ny-2;++j){
+    for (int j=1;j<param.ny-1;++j){
         k = j*param.nx + i;
+        printf("k value le Segment [AB]: %d\n",k);
         //Calcul des coefficient (a,b,c,d,e,f)
         a = ((dt/vol[i][j])*(param.D)*( (deltaX(i,j,x)/deltaY(i,j,yv)) + (deltaX(i,j,x)/deltaY(i,j-1,yv)) ));
         b = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j,yv)) ));
@@ -607,6 +642,7 @@ void creation_A(struct type_donneesc param,int NA, float dt, float **x,float **y
     i = 0 ;
     j = 0 ;
     k = j*param.nx + i;
+   printf("k value le Coin 0: %d\n",k);
     //Calcul des coefficient (a,b,c,d,e,f)
     a = ((dt/vol[i][j])*(param.D)*( (deltaX(i,j,x)/deltaY(i,j,yv)) + (deltaX(i,j,x)/(deltaY(i,j,yv)/2))+ (deltaY(i,j,y)/deltaX(i,j,xv)) + (deltaY(i,j,y)/(deltaX(i,j,xv)/2))  ));
     b = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j,yv)) ));
@@ -628,6 +664,7 @@ void creation_A(struct type_donneesc param,int NA, float dt, float **x,float **y
     i = 0 ;
     j = param.ny - 1;
     k = j*param.nx + i;
+    printf("k value le Coin C: %d\n",k);
     //Calcul des coefficient (a,b,c,d,e,f)
     a = ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/(deltaY(i,j-1,yv)))+ (deltaY(i,j,y)/deltaX(i,j,xv)) + (deltaY(i,j,y)/((deltaX(i,j,xv)/2))) ));
     //b = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j,yv)) ));
@@ -650,6 +687,7 @@ void creation_A(struct type_donneesc param,int NA, float dt, float **x,float **y
     i = param.nx - 1 ;
     j = 0;
     k = j*param.nx + i;
+    printf("k value le Coin A: %d\n",k);
     //Calcul des coefficient (a,b,c,d,e,f)
     a =   ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j,yv)) + (deltaX(i,j,x)/(deltaY(i,j,yv)/2) )));
     b = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/deltaY(i,j,yv)) ));
@@ -669,6 +707,7 @@ void creation_A(struct type_donneesc param,int NA, float dt, float **x,float **y
     On a flux diff Est = - flux diff Ouest  
     Condition Limite dT/dy = 0; Ce qui annule le flux diff Nord
     */
+    printf("k value le Coin B: %d\n",k);
     i = param.nx - 1 ;
     j = param.ny - 1;
     k = j*param.nx + i;
@@ -694,10 +733,12 @@ void creation_B(struct type_donneesc param, int NA, float dt, float **x, float *
     int k;
     float a,b,c,d,e;        
     //Cas dans le domaine
-	for (int i=1;i<param.nx-2;++i){
-        for (int j=1;j<param.ny-2;++j){
+	for (int i=1;i<param.nx-1;++i){
+        for (int j=1;j<param.ny-1;++j){
+            k = j*param.nx + i;
             //Rappel B juste Vecteur colonne de taille Ny
-            B[i*param.ny + j] = T0[i][j] +(dt/vol[i][j])*Fadv[i][j] ;
+            B[k] = T0[i][j] +(dt/vol[i][j])*Fadv[i][j] ;
+            printf("k value le domaine: => B[%d] : %f\n",k, B[k]);
         }
     }
 
@@ -709,10 +750,11 @@ void creation_B(struct type_donneesc param, int NA, float dt, float **x, float *
     e passe dans B
     */
     int i = 0; 
-	for (int j=1;j<param.ny-2;++j){
+	for (int j=1;j<param.ny-1;++j){
         k = j*param.nx + i;
         e = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,y)/(deltaX(i,j,xv))/2) ));
-        B[i*param.ny + j] = -e*param.Tg + T0[i][j] +(dt/vol[i][j])*Fadv[i][j];
+        B[k] = -e*param.Tg + T0[i][j] +(dt/vol[i][j])*Fadv[i][j];
+        printf("k value le Segment [OC]: => B[%d] : %f\n",k,B[k]);
     }
     //Segment [OA]
     /*
@@ -721,19 +763,21 @@ void creation_B(struct type_donneesc param, int NA, float dt, float **x, float *
     c passee dans B
     */
     int j = 0; 
-	for (int j=1;j<param.ny-2;++j){
+	for (int i=1;i<param.nx-1;++i){
         k = j*param.nx + i;
         c = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/(deltaY(i,j,yv)/2)) ));
-        B[i*param.ny + j] = -c*param.Tb + T0[i][j] +(dt/vol[i][j])*Fadv[i][j];
+        B[k] = -c*param.Tb + T0[i][j] +(dt/vol[i][j])*Fadv[i][j];
+        printf("k value le Segment [OA]: => B[%d] : %f\n",k,B[k]);
     }
     //Segment [CB]
     /*
     Condition Limite dT/dy = 0; Ce qui annule le flux diff Nord
     */
     j = param.ny - 1;
-	for (int i=1;i<param.nx-2;++i){
+	for (int i=1;i<param.nx-1;++i){
         k = j*param.nx + i;
-        B[i*param.ny + j] = T0[i][j] +(dt/vol[i][j])*Fadv[i][j] ;
+        B[k] = T0[i][j] +(dt/vol[i][j])*Fadv[i][j] ;
+        printf("k value le Segment [CB]: => B[%d] : %f\n",k,B[k]);
         
     }
     //Segment [AB]
@@ -742,9 +786,10 @@ void creation_B(struct type_donneesc param, int NA, float dt, float **x, float *
     On a flux diff Est = - flux diff Ouest 
     */
     i = param.nx-1;
-    for (int j=1;j<param.ny-2;++j){
+    for (int j=1;j<param.ny-1;++j){
         k = j*param.nx + i;
-        B[i*param.ny + j] = T0[i][j] +(dt/vol[i][j])*Fadv[i][j] ;
+        B[k] = T0[i][j] +(dt/vol[i][j])*Fadv[i][j] ;
+        printf("k value Segment [AB]: => B[%d] : %f\n",k,B[k]);
     }
     //Coin 0
     /*
@@ -757,7 +802,8 @@ void creation_B(struct type_donneesc param, int NA, float dt, float **x, float *
     //Calcul des coefficient (a,b,c,d,e,f)
     c = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/(deltaY(i,j,yv)/2)) ));
     e = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,x)/(deltaX(i,j,xv)/2)) ));
-    B[i*param.ny + j] = -c*param.Tb -e*param.Tg + T0[i][j] +(dt/vol[i][j])*Fadv[i][j];
+    B[k] = -c*param.Tb -e*param.Tg + T0[i][j] +(dt/vol[i][j])*Fadv[i][j];
+    printf("k value le Coin 0: => B[%d] : %f\n",k,B[k]);
 
     //Coin C
     /*
@@ -768,9 +814,11 @@ void creation_B(struct type_donneesc param, int NA, float dt, float **x, float *
     i = 0 ;
     j = param.ny - 1;
     k = j*param.nx + i;
-    e = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,x)/(deltaX(i,j,xv)/2)) ));
-    B[i*param.ny + j] = -e*param.Tg + T0[i][j] +(dt/vol[i][j])*Fadv[i][j];
-    
+    //e = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,x)/(deltaX(i,j,xv)/2)) ));
+    e = - ((dt/vol[i][j])*(param.D)*(  (deltaY(i,j,y)/(deltaX(i,j,xv))/2) ));
+    B[k] = -e*param.Tg + T0[i][j] +(dt/vol[i][j])*Fadv[i][j];
+    printf("k value le Coin C: => B[%d] : %f\n",k,B[k]);
+   
     //Coin A
     /*
     Problème en Ti-1,j et Ti,j+1
@@ -782,8 +830,9 @@ void creation_B(struct type_donneesc param, int NA, float dt, float **x, float *
     j = 0;
     k = j*param.nx + i;
     //Calcul des coefficient (a,b,c,d,e,f)
-    c = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/(deltaY(i,j-1,yv)/2) )));
-    B[i*param.ny + j] = -c*param.Tb + T0[i][j] +(dt/vol[i][j])*Fadv[i][j];
+    c = - ((dt/vol[i][j])*(param.D)*(  (deltaX(i,j,x)/(deltaY(i,j,yv)/2) )));
+    B[k] = -c*param.Tb + T0[i][j] +(dt/vol[i][j])*Fadv[i][j];
+    printf("k value le Coin A: => B[%d] : %f\n",k,B[k]);
     
     //Coin B
     /*
@@ -795,7 +844,8 @@ void creation_B(struct type_donneesc param, int NA, float dt, float **x, float *
     i = param.nx - 1 ;
     j = param.ny - 1;
     k = j*param.nx + i;
-    B[i*param.ny + j] =  T0[i][j] +(dt/vol[i][j])*Fadv[i][j];    
+    B[k] =  T0[i][j] +(dt/vol[i][j])*Fadv[i][j];    
+    printf("k value le Coin B: => B[%d] : %f\n",k,B[k]);
 }
 
 
@@ -804,12 +854,14 @@ void creation_B(struct type_donneesc param, int NA, float dt, float **x, float *
 void miseajour_T(struct type_donneesc param,float **T0,float **T1,float *B)
 {
 //int  i,j;
-int k;
+int k = 0;
 for (int i=0;i<param.nx;i++){
     for (int j=0;j<param.ny;j++){
         k = j*param.nx + i;
+        T1[i][j] = B[i*param.ny + j] ;
         T0[i][j] = B[i*param.ny + j] ;
-        T1[i][j] = B[i*param.ny + j];
+        float result = B[i*param.ny + j]; 
+       // printf("B(%d) = %f",k,result);
     }
 }
 

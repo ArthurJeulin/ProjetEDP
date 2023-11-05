@@ -126,6 +126,7 @@ if(param.i_solver==0)
 // Computation with the implicit scheme (Gauss method)
 if((param.i_solver)==1)
   {
+
   int NA;
   printf("Simulation with the implicit solver Gauss...\n");
 
@@ -138,27 +139,52 @@ if((param.i_solver)==1)
   printf("Gauss implemented\n");
 
   creation_A(param, NA, dt, x,y,xv,yv,vol,A);
+
+  	for (int i=0;i<param.nx*param.ny;++i){
+        for (int j=0;j<param.nx*param.ny;++j){
+            printf(" A[%d][%d] = %.3f",i,j,A[i][j]);
+        }
+        printf("\n");
+    }
   
   //On itère pour chaque pas de temps
   //tf = temps final et dt pas de temps 
   // N=(int)(param.tf/dt);
-  for (l=1;l<N;l++)
+  //for (l=1;l<N;l++)
+  for (l=0;l<N;l++)
     {
     printf("Iteration l=%d...\n",l);
     calc_flux_advc(param,x,y,xv,yv,U,V,T0,Fadv);
     //calc_flux_diffc(param,x,y,xv,yv,T0,Fdiff);
     creation_B(param, NA,dt, x, y,xv,yv,vol, Fadv,T0, B);
+      if(l<2){
+        for (int i=0;i<param.nx;++i){
+          for (int j=0;j<param.ny;++j){
+            printf(" B[%d] = %f\n",i*param.ny + j,B[i*param.ny + j]);
+        }
+       //printf("\n");
+      } 
+    }
     
     //A la sortie de GAUSS, la solution se trouve dans B.
     gaussij(param.nx*param.ny, A, B);
-    miseajour_T(param,T0,T1,B);
-    
+    printf("après gaussij--------------------------------------------------------\n");
+      if(l<1){
+        for (int i=0;i<param.nx;++i){
+          for (int j=0;j<param.ny;++j){
+              printf(" B[%d] = %f",i*param.ny + j,B[i*param.ny + j]);
+          }
+        printf("\n");
+        }
+      }
+
     if((l%param.Nout)==0)
       {
       VTSWriterc((float)(l)*dt,l,param.nx+1,param.ny+1,x,y,T1,U,V,"int");
       }
+    miseajour_T(param,T0,T1,B);
+      // (to be completed)
     }
-   // (to be completed)
 
   free(A);
   free(B);
